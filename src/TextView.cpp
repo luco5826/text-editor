@@ -98,7 +98,6 @@ void TextView::duplicateCursorLine(TextDocument &document) {
 }
 
 void TextView::swapSelectedLines(TextDocument &document, bool swapWithUp) {
-    
     auto lastSelection = this->content.getLastSelection();
     // If there is no selection, consider the cursor a selection. Design choice.
     if (!lastSelection.activa) {
@@ -154,7 +153,7 @@ void TextView::startSelectionFromCursor() {
     this->content.createNewSelection(this->cursor.getLineN(), this->cursor.getCharN());
 }
 
-void TextView::addTextInCursorPos(sf::String text, TextDocument &document) {
+void TextView::addTextInCursorPos(sf::String &text, TextDocument &document) {
     int textSize = text.getSize();
     int lineN = this->cursor.getLineN();
     int charN = this->cursor.getCharN();
@@ -166,33 +165,14 @@ void TextView::addTextInCursorPos(sf::String text, TextDocument &document) {
 
 // Borra el texto contenido en la seleccion y tambien la seleccion en si
 // Devuelve true si se borro una seleccion
-bool TextView::deleteSelections(TextDocument &document) {
+sf::String TextView::getSelections(TextDocument &document, TextView::Option option) {
     SelectionData::Selection lastSelection = this->content.getLastSelection();
-    this->removeSelections();
 
-    // Tomar el inicio de lastSelection, calcular el largo y borrar desde el inicio,
-    if (lastSelection.activa) {
-        int startLineN = SelectionData::getStartLineN(lastSelection);
-        int startCharN = SelectionData::getStartCharN(lastSelection);
-        int endLineN = SelectionData::getEndLineN(lastSelection);
-        int endCharN = SelectionData::getEndCharN(lastSelection);
-
-        // Muevo el cursor al inicio de la seleccion
-        this->cursor.setPosition(startLineN, startCharN, true);
-
-        // -1 por como funcionan los extremos de la seleccion
-        int amount = document.charAmountContained(startLineN, startCharN, endLineN, endCharN) - 1;
-        this->deleteTextAfterCursorPos(amount, document);
+    if (option == TextView::Option::DELETE || option == TextView::Option::CUT) {
+        this->removeSelections();
     }
-
-    return lastSelection.activa;
-}
-
-sf::String TextView::copySelections(TextDocument &document) {
-    SelectionData::Selection lastSelection = this->content.getLastSelection();
-    //this->removeSelections();
-
     sf::String copied = "";
+
     // Tomar el inicio de lastSelection, calcular el largo y borrar desde el inicio,
     if (lastSelection.activa) {
         int startLineN = SelectionData::getStartLineN(lastSelection);
@@ -205,8 +185,16 @@ sf::String TextView::copySelections(TextDocument &document) {
 
         // -1 por como funcionan los extremos de la seleccion
         int amount = document.charAmountContained(startLineN, startCharN, endLineN, endCharN) - 1;
+
+        //No matter the option, copy the selected string anyway
+        //(we need it in order to distinguish DELETE a selection and DELETE from backspace/Del key)
         copied = document.getTextFromPos(amount, startLineN, startCharN);
+
+        if (option == TextView::Option::DELETE || option == TextView::Option::CUT) {
+            this->deleteTextAfterCursorPos(amount, document);
+        }
     }
+
     return copied;
 }
 

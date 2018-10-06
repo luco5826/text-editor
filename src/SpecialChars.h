@@ -52,7 +52,7 @@
 
 namespace SpecialChars {
 
-std::string convertSpecialChar(sf::Uint32 c, std::ofstream &outputFile);
+std::string convertSpecialChar(sf::Uint32& c, std::ofstream& outputFile);
 
 }  // namespace SpecialChars
 

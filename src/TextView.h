@@ -13,16 +13,19 @@ class TextView {
     void draw(sf::RenderWindow &window, TextDocument &document);
     void setFontSize(int fontSize);
 
+    enum Option { COPY,
+                  CUT,
+                  DELETE };
+
     void selectText(int startLineN, int startCharN, int endLineN, int endCharN);
     void removeSelections();
-    bool deleteSelections(TextDocument &document);
-    sf::String copySelections(TextDocument &document);
+    sf::String getSelections(TextDocument &document, TextView::Option option);
 
     void startSelectionFromMouse(float mouseX, float mouseY, const TextDocument &document);
     void startSelectionFromCursor();
     void cursorActive(float mouseX, float mouseY, const TextDocument &document);
 
-    void addTextInCursorPos(sf::String text, TextDocument &document);
+    void addTextInCursorPos(sf::String &text, TextDocument &document);
     void deleteTextAfterCursorPos(int amount, TextDocument &document);
     void deleteTextBeforeCursorPos(int amount, TextDocument &document);
 

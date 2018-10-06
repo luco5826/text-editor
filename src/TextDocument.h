@@ -13,20 +13,17 @@
 
 #include "SpecialChars.h"
 
-using std::string;
-using std::vector;
-
 class TextDocument {
    public:
-    bool init(string &filename);
-    bool saveFile(string &filename);
+    bool init(std::string& filename);
+    bool saveFile(std::string& filename);
     bool hasChanged();
 
     sf::String getLine(int lineNumber);
     int charsInLine(int line) const;
     int getLineCount() const;
 
-    void addTextToPos(sf::String text, int line, int charN);
+    void addTextToPos(sf::String& text, int line, int charN);
     void removeTextFromPos(int amount, int line, int charN);
     sf::String getTextFromPos(int amount, int line, int charN);
 
@@ -38,14 +35,14 @@ class TextDocument {
     bool initLinebuffer();
     sf::String buffer;
     int length;
-    vector<int> lineBuffer;
+    std::vector<int> lineBuffer;
     bool documentHasChanged;
 
     int getBufferPos(int line, int charN);
 
     void swapWithNextLine(int line);
 
-    sf::String toUtf32(const std::string &inString);
+    sf::String toUtf32(const std::string& inString);
 };
 
 #endif

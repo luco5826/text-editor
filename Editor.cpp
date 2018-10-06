@@ -1,12 +1,15 @@
 #include <SFML/Graphics.hpp>
-#include "TextView.h"
-#include "TextDocument.h"
 #include "InputController.h"
-#include "ImplementationUtils.h"
+#include "TextDocument.h"
+#include "TextView.h"
 
 int main(int argc, char* argv[]) {
-
-    std::string workingDirectory = ImplementationUtils::getWorkingDirectory(argv[0]);
+#ifdef __linux__
+    std::string workingDirectory = argv[0];
+    workingDirectory = workingDirectory.substr(0, workingDirectory.find_last_of("/") + 1);
+#elif defined _WIN32 || _WIN64
+    std::string workingDirectory = "";
+#endif
 
     std::string saveFileName;
     std::string loadFileName;
@@ -38,9 +41,9 @@ int main(int argc, char* argv[]) {
             if (event.type == sf::Event::Resized) {
                 textView.setCameraBounds(event.size.width, event.size.height);
             }
+
             if (event.key.code == sf::Keyboard::S && sf::Keyboard::isKeyPressed(sf::Keyboard::LControl)) {
-                if (document.hasChanged()){
-                    
+                if (document.hasChanged()) {
                     document.saveFile(saveFileName);
                     std::cout << "SAVED TO: " << saveFileName << "\n";
                 }

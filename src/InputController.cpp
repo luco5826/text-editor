@@ -5,6 +5,7 @@ InputController::InputController() {
     this->shiftPresionado = false;
 }
 
+#include <thread>
 void InputController::handleEvents(TextDocument &document, TextView &textView,
                                    sf::RenderWindow &window, sf::Event &event) {
     this->handleMouseEvents(document, textView, window, event);
@@ -123,16 +124,17 @@ void InputController::handleKeyPressedEvents(TextDocument &document, TextView &t
             if (event.key.code == sf::Keyboard::D) {
                 textView.duplicateCursorLine(document);
             } else if (event.key.code == sf::Keyboard::U) {
-                textView.deleteSelections(document);
+                textView.getSelections(document, TextView::Option::DELETE);
                 sf::String emoji = "\\_('-')_/";
                 textView.addTextInCursorPos(emoji, document);
             } else if (event.key.code == sf::Keyboard::C) {  //Copy command, Ctrl + C
-                this->stringCopied = textView.copySelections(document);
+                this->stringCopied = textView.getSelections(document, TextView::Option::COPY);
             } else if (event.key.code == sf::Keyboard::V) {  //Paste command, Ctrl + V
+                //If something is selected, overwrite it
+                textView.getSelections(document, TextView::Option::DELETE);
                 textView.addTextInCursorPos(stringCopied, document);
             } else if (event.key.code == sf::Keyboard::X) {  //Cut command, Ctrl + X
-                this->stringCopied = textView.copySelections(document);
-                textView.deleteSelections(document);
+                this->stringCopied = textView.getSelections(document, TextView::Option::CUT);
             }
         }
 
@@ -192,14 +194,15 @@ void InputController::handleTextEnteredEvent(TextDocument &document, TextView &t
         bool ctrlPressed = sf::Keyboard::isKeyPressed(sf::Keyboard::LControl);
         sf::String input(event.text.unicode);
 
+        //If the string returned from  getSelections is empty, it means that no Selection was active
         if (event.text.unicode == '\b') {
-            bool selecionDeleted = textView.deleteSelections(document);
-            if (!selecionDeleted) {
+            bool noTextSelected = textView.getSelections(document, TextView::Option::DELETE).isEmpty();
+            if (noTextSelected) {
                 textView.deleteTextBeforeCursorPos(1, document);
             }
         } else if (event.text.unicode == 127) {  // 127 = delete (supr)
-            bool selecionDeleted = textView.deleteSelections(document);
-            if (!selecionDeleted) {
+            bool noTextSelected = textView.getSelections(document, TextView::Option::DELETE).isEmpty();
+            if (noTextSelected) {
                 textView.deleteTextAfterCursorPos(1, document);
             }
             // Escribir normalmente solo si ctrl no esta presionado
@@ -209,7 +212,7 @@ void InputController::handleTextEnteredEvent(TextDocument &document, TextView &t
                 input = "    ";
             }
 
-            textView.deleteSelections(document);
+            textView.getSelections(document, TextView::Option::DELETE);
             textView.addTextInCursorPos(input, document);
         }
     }

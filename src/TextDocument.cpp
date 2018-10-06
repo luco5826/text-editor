@@ -2,7 +2,7 @@
 
 // La idea es leer el file y guardarlo en buffer (quiero cargarlo en la memoria)
 // Para esto uso std::ifstream para levantar el archivo
-bool TextDocument::init(string &filename) {
+bool TextDocument::init(std::string &filename) {
     std::ifstream inputFile(filename);
     if (!inputFile.is_open()) {
         std::cerr << "Error opening file: " << filename << std::endl;
@@ -19,7 +19,7 @@ bool TextDocument::init(string &filename) {
     return true;
 }
 
-bool TextDocument::saveFile(string &filename) {
+bool TextDocument::saveFile(std::string &filename) {
     std::ofstream outputFile(filename);
     if (!outputFile.is_open()) {
         std::cerr << "Error opening file: " << filename << std::endl;
@@ -58,6 +58,7 @@ bool TextDocument::initLinebuffer() {
             this->lineBuffer.push_back(lineStart);
         }
     }
+
     return true;
 }
 
@@ -97,7 +98,7 @@ sf::String TextDocument::toUtf32(const std::string &inString) {
     return outString;
 }
 
-void TextDocument::addTextToPos(sf::String text, int line, int charN) {
+void TextDocument::addTextToPos(sf::String &text, int line, int charN) {
     this->documentHasChanged = true;
 
     int textSize = text.getSize();

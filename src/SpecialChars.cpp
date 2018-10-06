@@ -1,7 +1,7 @@
 #include "SpecialChars.h"
 
 namespace SpecialChars {
-std::string convertSpecialChar(sf::Uint32 c, std::ofstream &outputFile) {
+std::string convertSpecialChar(sf::Uint32& c, std::ofstream& outputFile) {
     switch (c) {
         case A_LOWER_ACUTE:
             return "á";
